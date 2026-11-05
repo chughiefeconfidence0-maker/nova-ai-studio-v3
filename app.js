@@ -158,9 +158,11 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "The writing service could not complete the request.");
     result.textContent = data.text || "No draft was returned.";
+    window.dispatchEvent(new CustomEvent("nova-session", { detail: currentSession }));
   } catch (error) {
     result.classList.add("error");
     result.textContent = error.message || "Unable to generate writing. Please try again.";
+    window.dispatchEvent(new CustomEvent("nova-session", { detail: currentSession }));
   }
 });
 
