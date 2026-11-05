@@ -120,18 +120,33 @@ app.post("/api/write", writeLimiter, requireUser, async (req, res) => {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
         body: JSON.stringify({
-          contents: [{
+          systemInstruction: {
             parts: [{
-              text: "You are Nova AI Studio's professional writing assistant. Create a useful, clear and polished result.\n" +
-                "Writing type: " + writingType + "\nUser request: " + prompt
+              text: "You are Nova AI Studio's professional writing assistant. Follow the user's writing request, produce a useful, clear and polished result, and do not claim to have performed actions outside writing."
             }]
-          }]
+          },
+          contents: [{
+            role: "user",
+            parts: [{
+              text: "Writing type: " + writingType + "\nUser request: " + prompt
+            }]
+          }],
+          generationConfig: { maxOutputTokens: 4096 }
         }),
         signal: AbortSignal.timeout(60000)
       }
     );
     if (!googleResponse.ok) {
       console.error("Gemini request failed:", googleResponse.status);
+      if (googleResponse.status === 429) {
+        return res.status(429).json({ error: "The AI service is busy or its usage limit was reached. Please wait a little and try again." });
+      }
+      if (googleResponse.status === 400) {
+        return res.status(400).json({ error: "That request could not be processed. Please try rewording it." });
+      }
+      if (googleResponse.status === 401 || googleResponse.status === 403 || googleResponse.status === 404) {
+        return res.status(503).json({ error: "The AI writing service needs a configuration check. Please try again later." });
+      }
       return res.status(502).json({ error: "Gemini could not complete the request. Please try again." });
     }
     const data = await googleResponse.json();
@@ -141,6 +156,7 @@ app.post("/api/write", writeLimiter, requireUser, async (req, res) => {
     if (!generatedText) {
       return res.status(502).json({ error: "Gemini returned no writing. Please try again." });
     }
+    res.setHeader("Cache-Control", "no-store");
     return res.json({ text: generatedText });
   } catch (error) {
     console.error("Writing request failed:", error.name);
