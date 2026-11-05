@@ -7,7 +7,9 @@ Nova AI Studio V4.0 continues the responsive AI writing workspace with Supabase 
 - Supabase manages account creation, password handling, email confirmation, and sessions.
 - The browser sends its Supabase access token as a Bearer token.
 - The Express backend verifies that token with Supabase before allowing access to /api/write.
-- The AI endpoint has a per-IP request limit and validates prompt size.
+- The AI endpoint has a per-IP request limit, validates prompt size, and disables response caching.
+- The server sets Content Security Policy, HSTS on HTTPS requests, clickjacking protection, MIME-sniffing protection, a strict referrer policy, and a restrictive Permissions Policy.
+- Express serves only the intended frontend files instead of exposing the whole project directory.
 - Gemini credentials remain in Render environment variables and are never sent to the browser.
 - CORS is an additional browser control, not a replacement for authentication.
 
@@ -32,4 +34,4 @@ The frontend obtains the public Supabase URL/key from /api/config. The public an
 5. Open http://localhost:3000.
 
 ## Deployment and security review
-This branch is saved as Version 4.0; it is not automatically deployed or runtime-verified. Before inviting real users, test registration, email confirmation, sign-in, sign-out, and real AI writing. Review HTTPS, session handling, API-key secrecy and rotation if exposed, input validation, rate limits, database permissions and Row Level Security, backups, monitoring, logging, dependency vulnerabilities, and abuse controls.
+This branch is saved as Version 4.0; it is not automatically deployed or runtime-verified. Security headers and restricted public file routes are included in the branch, but they still require deployed-browser testing. Before inviting real users, test registration, email confirmation, sign-in, sign-out, and real AI writing. Review HTTPS, session handling, API-key secrecy and rotation if exposed, input validation, rate limits, database permissions and Row Level Security, backups, monitoring, logging, dependency vulnerabilities, and abuse controls.
