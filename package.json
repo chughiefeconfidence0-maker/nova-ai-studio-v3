@@ -2,12 +2,14 @@
   "name": "nova-ai-studio-v3",
   "version": "3.0.0",
   "private": true,
-  "description": "Nova AI Studio Version 3.0 starter",
+  "description": "Nova AI Studio Version 3.0",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "@supabase/supabase-js": "^2.80.0",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.1.0"
   }
 }
