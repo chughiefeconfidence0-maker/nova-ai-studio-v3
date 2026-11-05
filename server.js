@@ -6,6 +6,27 @@ const rateLimit = require("express-rate-limit");
 const app = express();
 app.set("trust proxy", 1);
 
+// Security headers for every response. Render terminates HTTPS before forwarding
+// requests, so HSTS is enabled only when the original request used HTTPS.
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; " +
+    "img-src 'self' data:; connect-src 'self' https://nova-ai-studio-v3.onrender.com https://*.supabase.co; " +
+    "font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; " +
+    "form-action 'self'; upgrade-insecure-requests"
+  );
+  if (req.secure || req.headers["x-forwarded-proto"] === "https") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+  next();
+});
+
 const ALLOWED_ORIGINS = new Set([
   "https://chughiefeconfidence0-maker.github.io",
   "https://nova-ai-studio-v3.onrender.com"
@@ -27,7 +48,22 @@ app.use("/api", (req, res, next) => {
 });
 
 app.use(express.json({ limit: "20kb" }));
-app.use(express.static(path.join(__dirname), { dotfiles: "deny" }));
+// Serve only the public frontend files. Do not expose server.js, package files,
+// environment files, or other project files through Express static hosting.
+app.get("/", (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+app.get("/index.html", (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+app.get("/app.js", (req, res) => {
+  res.type("application/javascript").sendFile(path.join(__dirname, "app.js"));
+});
+app.get("/styles.css", (req, res) => {
+  res.type("text/css").sendFile(path.join(__dirname, "styles.css"));
+});
 
 const authLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -87,6 +123,7 @@ async function requireUser(req, res, next) {
 }
 
 app.post("/api/write", writeLimiter, requireUser, async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   const { prompt, type } = req.body || {};
   if (typeof prompt !== "string" || !prompt.trim() || prompt.length > 8000) {
     return res.status(400).json({ error: "Enter a prompt of up to 8,000 characters." });
