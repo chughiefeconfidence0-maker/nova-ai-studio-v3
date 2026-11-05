@@ -7,7 +7,9 @@ const path = require("path");
 const app = express();
 app.use(express.json({ limit: "20kb" }));
 app.use(express.static(path.join(__dirname)));
-
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", service: "Nova AI Studio V3.0" });
+});
 app.post("/api/write", async (req, res) => {
   const { prompt, type } = req.body || {};
   if (typeof prompt !== "string" || !prompt.trim()) {
