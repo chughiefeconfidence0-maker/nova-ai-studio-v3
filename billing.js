@@ -22,13 +22,29 @@ function registerBillingRoutes(app, { requireUser, supabaseAdmin }) {
   const secret = process.env.PAYSTACK_SECRET_KEY;
 
   async function recordSuccessfulPayment(payment) {
-    const meta = payment.metadata || {};
-    const userId = meta.nova_user_id;
-    const toolId = meta.nova_tool_id;
-    const interval = meta.nova_interval;
+    const meta = typeof payment.metadata === "string"
+      ? (() => { try { return JSON.parse(payment.metadata); } catch { return {}; } })()
+      : (payment.metadata || {});
+    let userId = meta.nova_user_id;
+    let toolId = meta.nova_tool_id;
+    let interval = meta.nova_interval;
+    let customerEmail = String(payment.customer?.email || "").trim().toLowerCase();
+    let planCode = String(payment.plan?.plan_code || "");
+    if ((!userId || !toolId || !interval) && customerEmail && planCode) {
+      const { data: existing, error: lookupError } = await supabaseAdmin
+        .from("tool_subscriptions").select("user_id,tool_id,plan_interval")
+        .eq("customer_email", customerEmail).eq("plan_code", planCode).maybeSingle();
+      if (lookupError) throw lookupError;
+      if (existing) {
+        userId = existing.user_id;
+        toolId = existing.tool_id;
+        interval = existing.plan_interval;
+      }
+    }
     const config = TOOL_CONFIG[toolId];
     const plan = config && config.plans[interval];
-    if (!userId || !config || !plan || !plan.code) throw new Error("Payment metadata or plan is invalid.");
+    if (!userId || !config || !plan || !plan.code) throw new Error("Payment metadata or recurring subscription could not be matched.");
+    if (planCode && planCode !== plan.code) throw new Error("Payment plan did not match the selected subscription.");
     if (payment.status !== "success" || payment.currency !== "NGN" || Number(payment.amount) !== plan.amount) {
       throw new Error("Payment status, currency, or amount did not match the configured plan.");
     }
@@ -46,6 +62,7 @@ function registerBillingRoutes(app, { requireUser, supabaseAdmin }) {
 
     const { error: subError } = await supabaseAdmin.from("tool_subscriptions").upsert({
       user_id: userId, tool_id: toolId, plan_interval: interval, plan_code: plan.code,
+      customer_email: customerEmail || null,
       status: "active", current_period_end: addPeriod(interval), provider: "paystack",
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id,tool_id" });
@@ -64,7 +81,7 @@ function registerBillingRoutes(app, { requireUser, supabaseAdmin }) {
     if (trialError || subError) return res.status(503).json({ error: "Billing status is temporarily unavailable." });
     const active = !!sub && sub.status === "active" && new Date(sub.current_period_end) > new Date();
     const used = trial?.usage_count || 0;
-    return res.json({ tool: toolId, toolName: config.name, subscribed: active, periodEnd: active ? sub.current_period_end : null, trialLimit: config.trialLimit, trialUsed: used, trialRemaining: active ? null : Math.max(config.trialLimit - used, 0), paymentConfigured: !!(secret && config.plans.monthly.code && config.plans.yearly.code) });
+    return res.json({ tool: toolId, toolName: config.name, subscribed: active, periodEnd: active ? sub.current_period_end : null, trialLimit: config.trialLimit, trialUsed: used, trialRemaining: active ? null : Math.max(config.trialLimit - used, 0), paymentConfigured: !!(secret && config.plans.monthly.code && config.plans.yearly.code && config.plans.monthly.amount > 0 && config.plans.yearly.amount > 0) });
   });
 
   app.post("/api/billing/checkout", requireUser, async (req, res) => {
