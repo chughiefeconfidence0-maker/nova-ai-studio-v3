@@ -1,3 +1,5 @@
+const API_BASE = "https://nova-ai-studio-v3.onrender.com";
+
 const authPanel = document.getElementById("authPanel");
 const workspace = document.getElementById("workspace");
 const loginTab = document.getElementById("loginTab");
@@ -52,7 +54,7 @@ function showLogin(message = "Sign in to open your private workspace.") {
 
 async function initialize() {
   try {
-    const configResponse = await fetch("/api/config", { cache: "no-store" });
+    const configResponse = await fetch(API_BASE + "/api/config", { cache: "no-store" });
     const config = await configResponse.json();
     if (!configResponse.ok) throw new Error(config.error || "Authentication setup is incomplete.");
 
@@ -144,7 +146,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
     if (sessionError || !sessionData.session) throw new Error("Your session expired. Please sign in again.");
 
-    const response = await fetch("/api/write", {
+    const response = await fetch(API_BASE + "/api/write", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
