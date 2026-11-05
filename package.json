@@ -1,8 +1,8 @@
 {
   "name": "nova-ai-studio-v3",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "private": true,
-  "description": "Nova AI Studio Version 3.0",
+  "description": "Nova AI Studio Version 4.0",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
