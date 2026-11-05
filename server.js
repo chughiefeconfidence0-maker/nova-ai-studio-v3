@@ -42,7 +42,7 @@ app.use(express.json({ limit: "20kb" }));
 
 // Serve only the three public frontend files. Never expose server source,
 // package files, environment files, or other repository contents.
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get(["/", "/register"], (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 app.get("/app.js", (req, res) => res.sendFile(path.join(__dirname, "app.js")));
 app.get("/styles.css", (req, res) => res.sendFile(path.join(__dirname, "styles.css")));
 
