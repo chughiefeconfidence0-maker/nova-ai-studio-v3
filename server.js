@@ -53,7 +53,7 @@ const supabase = supabaseUrl && supabaseAnonKey
   : null;
 
 app.get("/health", (req, res) => {
-  res.json({ status: "OK", service: "Nova AI Studio V3.0" });
+  res.json({ status: "OK", service: "Nova AI Studio V4.0" });
 });
 
 app.get("/api/config", authLimiter, (req, res) => {
@@ -69,7 +69,7 @@ async function requireUser(req, res, next) {
     return res.status(503).json({ error: "Authentication is not configured yet." });
   }
   const authorization = req.headers.authorization || "";
-  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  const match = authorization.match(/^Bearer\\s+(.+)$/i);
   if (!match) {
     return res.status(401).json({ error: "Please sign in to use this feature." });
   }
@@ -105,8 +105,8 @@ app.post("/api/write", writeLimiter, requireUser, async (req, res) => {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: "You are Nova AI Studio's professional writing assistant. Create a useful, clear and polished result.\n" +
-                "Writing type: " + writingType + "\nUser request: " + prompt
+              text: "You are Nova AI Studio's professional writing assistant. Create a useful, clear and polished result.\\n" +
+                "Writing type: " + writingType + "\\nUser request: " + prompt
             }]
           }]
         }),
@@ -141,5 +141,5 @@ app.use((error, req, res, next) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log("Nova AI Studio server listening on " + port);
+  console.log("Nova AI Studio V4.0 server listening on " + port);
 });
