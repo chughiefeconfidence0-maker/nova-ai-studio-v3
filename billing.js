@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const TOOL_CONFIG = {
   writing: {
     name: "AI Writing Engine",
-    trialLimit: Number.parseInt(process.env.TRIAL_WRITING_LIMIT || "3", 10),
+    trialLimit: Number.parseInt(process.env.TRIAL_WRITING_LIMIT || "1", 10),
     plans: {
       monthly: { code: process.env.PAYSTACK_PLAN_WRITING_MONTHLY, amount: Number(process.env.PAYSTACK_PRICE_WRITING_MONTHLY_KOBO || 0) },
       yearly: { code: process.env.PAYSTACK_PLAN_WRITING_YEARLY, amount: Number(process.env.PAYSTACK_PRICE_WRITING_YEARLY_KOBO || 0) }
