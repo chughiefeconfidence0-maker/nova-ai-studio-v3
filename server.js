@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
 const rateLimit = require("express-rate-limit");
+const { registerBillingRoutes } = require("./billing");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -47,7 +48,7 @@ app.use("/api", (req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "20kb" }));
+app.use(express.json({ limit: "20kb", verify: (req, res, buf) => { if (req.originalUrl.startsWith("/api/billing/webhook")) req.rawBody = Buffer.from(buf); } }));
 // Serve only the public frontend files. Do not expose server.js, package files,
 // environment files, or other project files through Express static hosting.
 app.get("/", (req, res) => {
@@ -87,6 +88,8 @@ const supabase = supabaseUrl && supabaseAnonKey
       auth: { autoRefreshToken: false, persistSession: false }
     })
   : null;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAdmin = supabaseUrl && supabaseServiceRoleKey ? createClient(supabaseUrl, supabaseServiceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } }) : null;
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", service: "Nova AI Studio V4.0" });
@@ -122,6 +125,9 @@ async function requireUser(req, res, next) {
   }
 }
 
+if (supabaseAdmin) registerBillingRoutes(app, { requireUser, supabaseAdmin });
+else app.use("/api/billing", (req, res) => res.status(503).json({ error: "Billing database is not configured yet." }));
+
 app.post("/api/write", writeLimiter, requireUser, async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   const { prompt, type } = req.body || {};
@@ -133,6 +139,12 @@ app.post("/api/write", writeLimiter, requireUser, async (req, res) => {
     return res.status(503).json({ error: "The AI provider is not configured yet." });
   }
   try {
+    if (!supabaseAdmin) return res.status(503).json({ error: "The trial and subscription system is not configured yet." });
+    const trialLimit = Math.max(1, Math.min(20, Number.parseInt(process.env.TRIAL_WRITING_LIMIT || "3", 10) || 3));
+    const { data: trialData, error: trialError } = await supabaseAdmin.rpc("consume_tool_trial", { p_user_id: req.user.id, p_tool_id: "writing", p_trial_limit: trialLimit });
+    if (trialError) return res.status(503).json({ error: "Tool access could not be checked. Please try again later." });
+    const access = Array.isArray(trialData) ? trialData[0] : trialData;
+    if (!access || !access.allowed) return res.status(402).json({ error: "Your free trial is finished. Subscribe to continue." });
     const writingType = typeof type === "string" ? type.slice(0, 60) : "General writing";
     const googleResponse = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
