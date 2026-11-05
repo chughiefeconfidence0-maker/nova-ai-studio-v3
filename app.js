@@ -65,7 +65,7 @@ function friendlyAuthError(error) {
   if (/rate limit|too many requests/i.test(message)) return "Too many attempts. Please wait a little and try again.";
   if (/invalid.*otp|otp.*expired|token.*expired/i.test(message)) return "That code is incorrect or expired. Request a fresh code and try again.";
   if (/email.*not confirmed/i.test(message)) return "Please verify your email using the confirmation message we sent.";
-  if (/invalid login credentials/i.test(message)) return "Email or password is incorrect. If this is an older email-code account, choose email-code sign-in.";
+  if (/already registered|already exists|user_already_exists/i.test(message)) return "We could not complete account creation with those details. Check the information and try again, or use the sign-in option.";\n  if (/invalid login credentials/i.test(message)) return "Email or password is incorrect. If this is an older email-code account, choose email-code sign-in.";
   if (/password should be at least/i.test(message)) return "Choose a password with at least 8 characters.";
   return message;
 }
