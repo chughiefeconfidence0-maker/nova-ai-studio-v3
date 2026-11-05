@@ -140,7 +140,7 @@ app.post("/api/write", writeLimiter, requireUser, async (req, res) => {
   }
   try {
     if (!supabaseAdmin) return res.status(503).json({ error: "The trial and subscription system is not configured yet." });
-    const trialLimit = Math.max(1, Math.min(20, Number.parseInt(process.env.TRIAL_WRITING_LIMIT || "3", 10) || 3));
+    const trialLimit = Math.max(1, Math.min(20, Number.parseInt(process.env.TRIAL_WRITING_LIMIT || "1", 10) || 3));
     const { data: trialData, error: trialError } = await supabaseAdmin.rpc("consume_tool_trial", { p_user_id: req.user.id, p_tool_id: "writing", p_trial_limit: trialLimit });
     if (trialError) return res.status(503).json({ error: "Tool access could not be checked. Please try again later." });
     const access = Array.isArray(trialData) ? trialData[0] : trialData;
