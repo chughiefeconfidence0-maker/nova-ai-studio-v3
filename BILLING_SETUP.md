@@ -13,7 +13,7 @@ Add these in Render → Environment (server only):
 - `PAYSTACK_PLAN_WRITING_YEARLY`
 - `PAYSTACK_PRICE_WRITING_MONTHLY_KOBO`
 - `PAYSTACK_PRICE_WRITING_YEARLY_KOBO`
-- Optional: `TRIAL_WRITING_LIMIT` (defaults to 3) and `PAYSTACK_CALLBACK_URL`
+- Optional: `TRIAL_WRITING_LIMIT` (defaults to 1) and `PAYSTACK_CALLBACK_URL`
 
 Create monthly and annual plans in Paystack and enter their plan codes. Amount variables must match the plans and be in kobo (₦1,000 = 100000).
 
