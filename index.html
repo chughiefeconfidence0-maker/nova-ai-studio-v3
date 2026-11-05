@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b12">
+  <meta name="description" content="Nova AI Studio — your secure AI creative workspace.">
   <title>Nova AI Studio — Version 3.0</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
-      <div class="brand"><span class="brand-mark">✦</span> NOVA <span class="muted">AI STUDIO</span></div>
+      <a class="brand" href="/" aria-label="Nova AI Studio home"><span class="brand-mark">✦</span> NOVA <span class="muted">AI STUDIO</span></a>
       <span class="version">VERSION 3.0</span>
     </header>
 
@@ -21,25 +22,46 @@
     </section>
 
     <section class="panel auth-panel" id="authPanel">
-      <div class="tabs">
+      <div class="auth-heading">
+        <p class="eyebrow">SECURE EMAIL ACCESS</p>
+        <h2 id="authTitle">Welcome back</h2>
+        <p class="auth-intro" id="authIntro">Enter your email. We'll send you a secure 6-digit code.</p>
+      </div>
+
+      <div class="tabs" id="authTabs">
         <button class="tab active" id="loginTab" type="button">Sign in</button>
         <button class="tab" id="registerTab" type="button">Create account</button>
       </div>
-      <form id="authForm">
-        <label for="fullName" id="nameLabel" class="hidden">Full name</label>
-        <input id="fullName" class="hidden" autocomplete="name" placeholder="Your name">
+
+      <form id="emailForm">
+        <div id="nameField" class="hidden">
+          <label for="fullName">Your name</label>
+          <input id="fullName" autocomplete="name" maxlength="80" placeholder="Enter your name">
+        </div>
         <label for="email">Email address</label>
-        <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
-        <label for="password">Password</label>
-        <input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required>
-        <button class="primary" type="submit" id="authSubmit">Sign in</button>
-        <p class="small-note" id="authNote" aria-live="polite">Checking secure sign-in…</p>
+        <input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@gmail.com" required>
+        <button class="primary" type="submit" id="sendCodeBtn">Email me a code <span aria-hidden="true">→</span></button>
       </form>
+
+      <form id="verifyForm" class="hidden">
+        <label for="otpCode">6-digit verification code</label>
+        <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required>
+        <p class="small-note">Enter the code sent to <strong id="sentToEmail"></strong>.</p>
+        <button class="primary" type="submit" id="verifyCodeBtn">Verify code and continue</button>
+        <button class="text-button" type="button" id="resendCodeBtn">Resend code</button>
+        <button class="text-button muted-button" type="button" id="changeEmailBtn">Use a different email</button>
+      </form>
+
+      <div class="recovery" id="recoveryBox">
+        <button class="text-button" type="button" id="forgotLink">Forgot password or can't access your account?</button>
+        <p class="recovery-help hidden" id="recoveryHelp">Nova uses passwordless email sign-in, so there is no password to forget. Enter the email linked to your account and request a fresh code. Check your Spam or Promotions folder too. If you no longer have access to that email address, you will need help from the Nova account administrator.</p>
+      </div>
+      <p class="small-note auth-note" id="authNote" role="status" aria-live="polite">Your email code is private. Never share it with anyone.</p>
     </section>
 
     <section id="workspace" class="hidden">
       <div class="workspace-bar">
-        <p id="welcomeText">You are signed in.</p>
+        <div><p class="eyebrow">PRIVATE WORKSPACE</p><p id="welcomeText">You are signed in.</p></div>
         <button class="secondary" id="logoutBtn" type="button">Sign out</button>
       </div>
       <section class="panel writing-panel">
@@ -63,7 +85,7 @@
       </section>
     </section>
 
-    <footer>Nova AI Studio · Version 3.0 · Provider keys stay on the server.</footer>
+    <footer>Nova AI Studio · Version 3.0 · Secure email verification · Provider keys stay on the server.</footer>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
