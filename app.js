@@ -43,6 +43,16 @@ function setMode(register) {
   showAuthForm(passwordForm);
   showMessage(register ? "Use a password you have not used on another website." : "Welcome back. Your Nova account is waiting.");
 }
+// Capture the Create account tap early so mobile taps always switch the form.
+document.addEventListener("click", event => {
+  if (!(event.target instanceof Element)) return;
+  const registerButton = event.target.closest("#registerTab");
+  if (!registerButton) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  setMode(true);
+}, true);
+
 function showWorkspace(session) {
   currentSession = session;
   authPanel.classList.add("hidden");
