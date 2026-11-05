@@ -1,4 +1,5 @@
 const API_BASE = "https://nova-ai-studio-v3.onrender.com";
+const isRegisterPage = window.location.pathname.replace(/\/+$/, "") === "/register";
 const $ = id => document.getElementById(id);
 
 const authPanel = $("authPanel");
@@ -43,16 +44,6 @@ function setMode(register) {
   showAuthForm(passwordForm);
   showMessage(register ? "Use a password you have not used on another website." : "Welcome back. Your Nova account is waiting.");
 }
-// Capture the Create account tap early so mobile taps always switch the form.
-document.addEventListener("click", event => {
-  if (!(event.target instanceof Element)) return;
-  const registerButton = event.target.closest("#registerTab");
-  if (!registerButton) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  setMode(true);
-}, true);
-
 function showWorkspace(session) {
   currentSession = session;
   authPanel.classList.add("hidden");
@@ -67,7 +58,7 @@ function showLogin(message = "Sign in with your email and password.") {
   authPanel.classList.remove("hidden");
   $("authTabs").classList.remove("hidden");
   $("loginLinks").classList.remove("hidden");
-  setMode(false);
+  setMode(isRegisterPage);
   showMessage(message);
 }
 function friendlyAuthError(error) {
@@ -266,8 +257,6 @@ async function initialize() {
   }
 }
 
-$("loginTab").addEventListener("click", () => setMode(false));
-$("registerTab").addEventListener("click", () => setMode(true));
 passwordForm.addEventListener("submit", handlePasswordSubmit);
 codeRequestForm.addEventListener("submit", requestEmailCode);
 verifyForm.addEventListener("submit", verifyEmailCode);
@@ -359,5 +348,5 @@ $("generateBtn").addEventListener("click", async () => {
 });
 
 showAuthForm(passwordForm);
-setMode(false);
+setMode(isRegisterPage);
 initialize();
