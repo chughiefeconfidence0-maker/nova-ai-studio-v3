@@ -142,8 +142,8 @@ app.post("/api/write", writeLimiter, requireUser, async (req, res) => {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: "You are Nova AI Studio's professional writing assistant. Create a useful, clear and polished result.\\n" +
-                "Writing type: " + writingType + "\\nUser request: " + prompt
+              text: "You are Nova AI Studio's professional writing assistant. Create a useful, clear and polished result.\n" +
+                "Writing type: " + writingType + "\nUser request: " + prompt
             }]
           }]
         }),
