@@ -1,6 +1,6 @@
 const APP_URL = "https://nova-ai-studio-v3.onrender.com";
 const API_BASE = APP_URL;
-const isRegisterPage = window.location.pathname.replace(/\/+$/, "") === "/register";
+const isRegisterPage = window.location.pathname.replace(/\/+$/, "") === "/register" || new URLSearchParams(window.location.search).get("mode") === "register";
 const $ = id => document.getElementById(id);
 
 const authPanel = $("authPanel");
