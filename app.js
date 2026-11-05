@@ -35,7 +35,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   result.classList.remove("error");
   result.textContent = "Connecting to the secure AI backend…";
   try {
-    const response = await fetch("/api/write", {
+    const response = await fetch("https://nova-ai-studio-v3.onrender.com/api/write", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({prompt, type})
