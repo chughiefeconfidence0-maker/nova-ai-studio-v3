@@ -164,5 +164,50 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   }
 });
 
+
+let billingSession = null;
+document.addEventListener("nova-session", async event => {
+  billingSession = event.detail;
+  const status = document.getElementById("billingStatus");
+  const button = document.getElementById("subscribeBtn");
+  if (!status || !button) return;
+  try {
+    const r = await fetch(API_BASE + "/api/billing/access?tool=writing", {
+      headers: { Authorization: "Bearer " + billingSession.access_token }, cache: "no-store"
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Billing status unavailable.");
+    status.textContent = d.subscribed ? "Subscription active until " + new Date(d.periodEnd).toLocaleDateString() : d.trialRemaining + " free trial uses remaining.";
+    button.disabled = !d.paymentConfigured || d.subscribed;
+    button.textContent = d.subscribed ? "Subscription active" : (d.paymentConfigured ? "Subscribe to Writing" : "Payment setup pending");
+    const reference = new URLSearchParams(location.search).get("reference");
+    if (reference) {
+      const v = await fetch(API_BASE + "/api/billing/verify", {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + billingSession.access_token },
+        body: JSON.stringify({ reference })
+      });
+      const result = await v.json();
+      if (!v.ok) throw new Error(result.error || "Payment verification failed.");
+      status.textContent = result.message;
+      history.replaceState({}, document.title, location.pathname);
+    }
+  } catch (e) { status.textContent = e.message || "Billing status unavailable."; button.disabled = true; }
+});
+document.getElementById("subscribeBtn")?.addEventListener("click", async () => {
+  if (!billingSession) return;
+  const button = document.getElementById("subscribeBtn");
+  const status = document.getElementById("billingStatus");
+  button.disabled = true;
+  try {
+    const r = await fetch(API_BASE + "/api/billing/checkout", {
+      method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + billingSession.access_token },
+      body: JSON.stringify({ tool: "writing", interval: document.getElementById("billingInterval").value })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Checkout could not start.");
+    location.href = d.authorizationUrl;
+  } catch (e) { status.textContent = e.message || "Checkout could not start."; button.disabled = false; }
+});
+
 setMode(false);
 initialize();
