@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b12">
   <title>Nova AI Studio — Version 3.0</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -32,32 +33,39 @@
         <label for="password">Password</label>
         <input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required>
         <button class="primary" type="submit" id="authSubmit">Sign in</button>
-        <p class="small-note" id="authNote">Account system is a starter interface. Connect a trusted authentication service before launch.</p>
+        <p class="small-note" id="authNote" aria-live="polite">Checking secure sign-in…</p>
       </form>
     </section>
 
-    <section class="panel writing-panel">
-      <div class="section-heading">
-        <div><p class="eyebrow">FIRST AI TOOL</p><h2>AI Writing Engine</h2></div>
-        <span class="status">BACKEND REQUIRED</span>
+    <section id="workspace" class="hidden">
+      <div class="workspace-bar">
+        <p id="welcomeText">You are signed in.</p>
+        <button class="secondary" id="logoutBtn" type="button">Sign out</button>
       </div>
-      <label for="writingPrompt">What would you like to write?</label>
-      <textarea id="writingPrompt" rows="5" placeholder="Example: Write a friendly product description for a luxury gold bracelet..."></textarea>
-      <div class="controls">
-        <select id="writingType" aria-label="Writing type">
-          <option value="General writing">General writing</option>
-          <option value="Email">Email</option>
-          <option value="Social media caption">Social media caption</option>
-          <option value="Product description">Product description</option>
-          <option value="Short story">Short story</option>
-        </select>
-        <button class="primary" id="generateBtn" type="button">Generate draft ↗</button>
-      </div>
-      <div class="result" id="result" aria-live="polite">Your generated draft will appear here after the secure backend is configured.</div>
+      <section class="panel writing-panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">FIRST AI TOOL</p><h2>AI Writing Engine</h2></div>
+          <span class="status">SECURE WORKSPACE</span>
+        </div>
+        <label for="writingPrompt">What would you like to write?</label>
+        <textarea id="writingPrompt" rows="5" maxlength="8000" placeholder="Example: Write a friendly product description for a luxury gold bracelet..."></textarea>
+        <div class="controls">
+          <select id="writingType" aria-label="Writing type">
+            <option value="General writing">General writing</option>
+            <option value="Email">Email</option>
+            <option value="Social media caption">Social media caption</option>
+            <option value="Product description">Product description</option>
+            <option value="Short story">Short story</option>
+          </select>
+          <button class="primary" id="generateBtn" type="button">Generate draft ↗</button>
+        </div>
+        <div class="result" id="result" aria-live="polite">Your generated draft will appear here.</div>
+      </section>
     </section>
 
-    <footer>Nova AI Studio · Version 3.0 · Keep provider keys on the server, never in this page.</footer>
+    <footer>Nova AI Studio · Version 3.0 · Provider keys stay on the server.</footer>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>
