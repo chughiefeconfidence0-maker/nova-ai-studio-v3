@@ -1,4 +1,5 @@
-const API_BASE = "https://nova-ai-studio-v3.onrender.com";
+const APP_URL = "https://nova-ai-studio-v3.onrender.com";
+const API_BASE = APP_URL;
 const isRegisterPage = window.location.pathname.replace(/\/+$/, "") === "/register";
 const $ = id => document.getElementById(id);
 
@@ -87,7 +88,7 @@ async function handlePasswordSubmit(event) {
         password,
         options: {
           data: { full_name: $("fullName").value.trim() },
-          emailRedirectTo: window.location.origin
+          emailRedirectTo: APP_URL
         }
       });
       if (error) throw error;
@@ -167,7 +168,7 @@ async function requestPasswordReset(event) {
   const email = $("resetEmail").value.trim().toLowerCase();
   $("resetRequestBtn").disabled = true;
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: APP_URL });
     if (error) throw error;
     showMessage("If a Nova account exists for that email, a password-reset link has been sent. Check your inbox and Spam folder.");
   } catch (error) {
