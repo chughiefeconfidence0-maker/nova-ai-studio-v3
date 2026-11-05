@@ -26,8 +26,25 @@ app.use("/api", (req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+  );
+  next();
+});
+
 app.use(express.json({ limit: "20kb" }));
-app.use(express.static(path.join(__dirname), { dotfiles: "deny" }));
+
+// Serve only the three public frontend files. Never expose server source,
+// package files, environment files, or other repository contents.
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get("/app.js", (req, res) => res.sendFile(path.join(__dirname, "app.js")));
+app.get("/styles.css", (req, res) => res.sendFile(path.join(__dirname, "styles.css")));
 
 const authLimiter = rateLimit({
   windowMs: 60 * 1000,
