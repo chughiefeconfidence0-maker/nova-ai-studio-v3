@@ -37,6 +37,7 @@ function setMode(register) {
 
 function showWorkspace(session) {
   currentSession = session;
+  window.dispatchEvent(new CustomEvent("nova-session", { detail: session }));
   authPanel.classList.add("hidden");
   workspace.classList.remove("hidden");
   document.getElementById("welcomeText").textContent =
