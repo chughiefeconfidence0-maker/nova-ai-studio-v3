@@ -315,6 +315,9 @@ $("generateBtn").addEventListener("click", async () => {
     result.classList.add("error");
     return;
   }
+  const generateButton = $("generateBtn");
+  generateButton.disabled = true;
+  generateButton.textContent = "Generating…";
   result.classList.remove("error");
   result.textContent = "Connecting to the secure AI backend…";
   try {
@@ -325,12 +328,23 @@ $("generateBtn").addEventListener("click", async () => {
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + data.session.access_token },
       body: JSON.stringify({ prompt, type })
     });
-    const body = await response.json();
+    let body;
+    try {
+      body = await response.json();
+    } catch {
+      throw new Error("The writing service returned an unreadable response. Please try again.");
+    }
     if (!response.ok) throw new Error(body.error || "The writing service could not complete the request.");
-    result.textContent = body.text || "No draft was returned.";
+    if (typeof body.text !== "string" || !body.text.trim()) {
+      throw new Error("The AI returned an empty draft. Please try again.");
+    }
+    result.textContent = body.text;
   } catch (error) {
     result.classList.add("error");
     result.textContent = error.message || "Unable to generate writing. Please try again.";
+  } finally {
+    generateButton.disabled = false;
+    generateButton.textContent = "Generate draft ↗";
   }
 });
 
