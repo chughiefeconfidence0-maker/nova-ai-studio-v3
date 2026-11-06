@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b12">
+  <title>Create your account — Nova AI Studio V3.0</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .register-steps{display:flex;gap:8px;margin:18px 0 24px}
+    .register-step{flex:1;text-align:center;border:1px solid #ffffff18;border-radius:10px;padding:9px 5px;color:#9ca7c4;font-size:11px}
+    .register-step.active{border-color:#a997ff88;background:#a997ff14;color:#fff}
+    .register-step.done{border-color:#71e5f266;color:#71e5f2}
+    .register-success{border:1px solid #71e5f255;background:#71e5f20c;border-radius:14px;padding:18px;margin-top:16px}
+    .register-success h3{margin:0 0 8px}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Nova AI Studio home"><span class="brand-mark">✦</span> NOVA <span class="muted">AI STUDIO</span></a>
+      <span class="version">VERSION 3.0</span>
+    </header>
+    <section class="hero">
+      <p class="eyebrow">JOIN NOVA AI STUDIO</p>
+      <h1>Create your<br><span>own account.</span></h1>
+      <p class="sub">Register with a username, email address and secure password. Verify your email to activate your account.</p>
+    </section>
+    <section class="panel auth-panel" id="registerPanel">
+      <div class="auth-heading">
+        <p class="eyebrow">NEW MEMBER REGISTRATION</p>
+        <h2 id="registerTitle">Create account</h2>
+        <p class="auth-intro" id="registerIntro">Complete each field below to join Nova.</p>
+      </div>
+      <div class="register-steps" aria-label="Registration steps">
+        <div class="register-step active" id="stepDetails">1 · Details</div>
+        <div class="register-step" id="stepVerify">2 · Verify email</div>
+        <div class="register-step" id="stepAccess">3 · Sign in</div>
+      </div>
+      <form id="registerForm">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" placeholder="e.g. nova_creator" required>
+        <p class="small-note">3–24 characters. Use letters, numbers or underscores.</p>
+        <label for="fullName">Full name</label>
+        <input id="fullName" name="fullName" type="text" autocomplete="name" maxlength="80" placeholder="Enter your name" required>
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" placeholder="you@example.com" required>
+        <label for="password">Create password</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="At least 8 characters" required>
+        <label for="confirmPassword">Confirm password</label>
+        <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="Enter your password again" required>
+        <button class="primary" id="createAccountBtn" type="submit">Create my account →</button>
+      </form>
+      <section id="verifySection" class="hidden">
+        <div class="register-success">
+          <h3>Check your email 📩</h3>
+          <p id="verifyMessage">We sent a confirmation email to your address. Open it and tap the verification link to activate your Nova account.</p>
+        </div>
+        <button class="primary" id="resendVerificationBtn" type="button">Resend verification email</button>
+        <button class="text-button" id="changeEmailBtn" type="button">Use a different email</button>
+      </section>
+      <p class="small-note" id="registerMessage" role="status" aria-live="polite">Already have a Nova account? Sign in below.</p>
+      <a class="text-button" href="/">← Back to sign in</a>
+    </section>
+    <footer>Nova AI Studio · Version 3.0 · Secure account registration</footer>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/register.js?v=20261106-2"></script>
+</body>
+</html>
